@@ -1,0 +1,3123 @@
+<!doctype html>
+<html lang="th" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#22c55e" />
+    <meta name="application-name" content="PDF Tools" />
+    <meta name="apple-mobile-web-app-title" content="PDF Tools" />
+    <title>PDF Tools - เครื่องมือจัดการ PDF</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link
+      rel="icon"
+      href="./image/icon-32.png"
+      sizes="32x32"
+      type="image/png"
+    />
+    <link rel="apple-touch-icon" href="./image/icon-192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
+    <script src="https://unpkg.com/lucide@1.61.0"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.2/jszip.min.js"></script>
+    <script src="js/vendor/fontkit.umd.min.js"></script>
+    <script type="module">
+      import * as pdfjs_lib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.4.299/pdf.min.mjs';
+
+      pdfjs_lib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.4.299/pdf.worker.min.mjs';
+      window.pdfjsLib = pdfjs_lib;
+    </script>
+    <style type="text/tailwindcss">
+      @custom-variant dark (&:where(.dark, .dark *));
+
+      @theme {
+        --font-sans: 'Inter', 'Noto Sans Thai', sans-serif;
+      }
+
+      @layer base {
+        button:not(:disabled),
+        [role='button']:not(:disabled) {
+          cursor: pointer;
+        }
+      }
+    </style>
+    <style>
+      * {
+        font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Sarabun';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Sarabun-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Noto Sans Thai';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/NotoSansThai-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Prompt-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Kanit';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Kanit-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Mitr';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Mitr-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Bai Jamjuree';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/BaiJamjuree-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Chakra Petch';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/ChakraPetch-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Pridi';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Pridi-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Taviraj';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Taviraj-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Mali';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Mali-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Itim';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Itim-Regular.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-display: swap;
+        font-family: 'Sriracha';
+        font-style: normal;
+        font-weight: 400;
+        src: url('./fonts/Sriracha-Regular.ttf') format('truetype');
+      }
+
+      :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f5f5f5;
+        --bg-tertiary: #f0f0f0;
+        --bg-canvas: #e8e8e8;
+        --bg-glass: rgba(255, 255, 255, 0.8);
+        --bg-overlay: rgba(0, 0, 0, 0.6);
+        --bg-page: #ffffff;
+        --text-page: #171717;
+        --border-color: #e5e5e5;
+        --border-strong: #858585;
+        --text-primary: #171717;
+        --text-secondary: #404040;
+        --text-muted: #666666;
+        --accent: #15803d;
+        --accent-hover: #166534;
+        --on-accent: #ffffff;
+        --accent-text: #166534;
+        --accent-subtle: rgba(21, 128, 61, 0.1);
+        --warning: #92400e;
+        --warning-subtle: rgba(146, 64, 14, 0.1);
+        --danger: #b91c1c;
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --logo-gradient: linear-gradient(
+          135deg,
+          #4ade80 0%,
+          #22c55e 50%,
+          #15803d 100%
+        );
+      }
+
+      .dark {
+        --bg-primary: #171717;
+        --bg-secondary: #0f0f0f;
+        --bg-tertiary: #222222;
+        --bg-canvas: #0a0a0a;
+        --bg-glass: rgba(15, 15, 15, 0.8);
+        --border-color: #2a2a2a;
+        --border-strong: #737373;
+        --text-primary: #f5f5f5;
+        --text-secondary: #a3a3a3;
+        --text-muted: #8a8a8a;
+        --accent: #22c55e;
+        --accent-hover: #4ade80;
+        --on-accent: #052e16;
+        --accent-text: #4ade80;
+        --accent-subtle: rgba(34, 197, 94, 0.14);
+        --warning: #fbbf24;
+        --warning-subtle: rgba(251, 191, 36, 0.14);
+        --danger: #f87171;
+      }
+
+      body {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .text-muted {
+        color: var(--text-muted);
+      }
+
+      header {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 24px;
+      }
+
+      main {
+        padding: 24px;
+      }
+
+      aside section + section {
+        margin-top: 24px;
+      }
+
+      h2 {
+        margin-bottom: 12px;
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible,
+      [tabindex]:focus-visible,
+      .upload-zone:has(#pdf-file-input:focus-visible),
+      .compression-level-card:has(input:focus-visible) {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .btn {
+        align-items: center;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        display: inline-flex;
+        font-size: 14px;
+        font-weight: 500;
+        gap: 8px;
+        justify-content: center;
+        min-height: 36px;
+        padding: 6px 14px;
+      }
+
+      .btn > svg {
+        flex-shrink: 0;
+        height: 18px;
+        width: 18px;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--on-accent);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: var(--accent-hover);
+      }
+
+      .btn-secondary {
+        background: var(--bg-tertiary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: var(--border-color);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-secondary);
+      }
+
+      .btn-ghost:hover:not(:disabled) {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+
+      .btn-icon {
+        height: 36px;
+        padding: 0;
+        width: 36px;
+      }
+
+      .btn-icon > svg,
+      .btn-icon svg {
+        height: 20px;
+        width: 20px;
+      }
+
+      .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .icon-18 {
+        height: 18px;
+        width: 18px;
+      }
+
+      .spin-icon {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .toast-region {
+        bottom: 16px;
+        display: grid;
+        gap: 8px;
+        left: 50%;
+        position: fixed;
+        transform: translateX(-50%);
+        width: min(420px, calc(100vw - 32px));
+        z-index: 50;
+      }
+
+      .toast {
+        align-items: center;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        display: grid;
+        font-size: 13px;
+        gap: 8px;
+        grid-template-columns: auto 1fr auto;
+        padding: 10px 12px;
+      }
+
+      .toast-icon,
+      .toast svg.toast-icon {
+        height: 18px;
+        width: 18px;
+      }
+
+      .toast-success .toast-icon {
+        color: var(--accent);
+      }
+
+      .toast-error {
+        border-color: var(--danger);
+      }
+
+      .toast-error .toast-icon {
+        color: var(--danger);
+      }
+
+      .toast-message {
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .toast-close {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: inline-flex;
+        height: 32px;
+        justify-content: center;
+        width: 32px;
+      }
+
+      .toast-close svg {
+        height: 16px;
+        width: 16px;
+      }
+
+      .workspace-busy-indicator {
+        align-items: center;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-muted);
+        display: inline-flex;
+        font-size: 12px;
+        gap: 6px;
+        left: 50%;
+        margin: 0;
+        padding: 6px 10px;
+        pointer-events: none;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+      }
+
+      .workspace-busy-indicator.hidden {
+        display: none;
+      }
+
+      .workspace-busy-indicator svg {
+        height: 14px;
+        width: 14px;
+      }
+
+      .live-preview-hint {
+        background: var(--bg-primary);
+        border: 1px solid var(--danger);
+        border-radius: var(--radius-sm);
+        color: var(--danger);
+        font-size: 12px;
+        margin: 0;
+        max-width: calc(100% - 32px);
+        padding: 4px 10px;
+        text-align: center;
+      }
+
+      .live-preview-hint:empty {
+        display: none;
+      }
+
+      .text-workspace {
+        flex: 1;
+        margin: 0;
+        max-width: none;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 4px;
+        width: 100%;
+      }
+
+      .text-workspace:not(.hidden) {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .main-content:has(#text-workspace:not(.hidden)) .preview-workspace-panel {
+        display: none;
+      }
+
+      .text-workspace-header {
+        align-items: center;
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+      }
+
+      .text-workspace-header .sidebar-title {
+        margin-bottom: 0;
+      }
+
+      .text-output {
+        display: grid;
+        gap: 12px;
+      }
+
+      .text-file {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .text-file h4 {
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .text-page {
+        display: grid;
+        gap: 4px;
+      }
+
+      .text-page-label {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .text-page-content {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 0;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+      }
+
+      .compress-compare-figure {
+        margin: 0;
+        max-height: 100%;
+        max-width: calc(50% - 8px);
+      }
+
+      .pdf-preview-frame:has(#compress-compare-figure:not(.hidden)) {
+        display: grid;
+        align-content: center;
+        gap: 8px 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: minmax(0, max-content) auto auto;
+      }
+
+      .pdf-preview-frame:has(#compress-compare-figure:not(.hidden))
+        #pdf-preview-image {
+        align-self: end;
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: center;
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      .compress-compare-figure:not(.hidden) {
+        display: grid;
+        grid-column: 2;
+        grid-row: 1 / span 3;
+        grid-template-rows: subgrid;
+        justify-items: center;
+        max-height: none;
+        max-width: none;
+        min-height: 0;
+      }
+
+      .compress-compare-figure .pdf-preview-image {
+        align-self: end;
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      .pdf-preview-frame:has(#compress-compare-figure:not(.hidden))
+        #compress-original-caption {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: center;
+      }
+
+      .compress-compare-caption {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 4px 10px;
+        text-align: center;
+      }
+
+      .compress-compare-warning {
+        background: var(--warning-subtle);
+        border-radius: var(--radius-sm);
+        color: var(--warning);
+        font-size: 12px;
+        margin: 0;
+        padding: 4px 10px;
+        text-align: center;
+      }
+
+      .split-range-help {
+        color: var(--text-muted);
+        font-size: 12px;
+        margin: 0 0 6px;
+      }
+
+      .split-range-help:empty {
+        display: none;
+      }
+
+      .icon-20 {
+        height: 20px;
+        width: 20px;
+      }
+
+      .icon-48 {
+        height: 48px;
+        width: 48px;
+      }
+
+      .header-logo {
+        background: var(--logo-gradient);
+        border-radius: var(--radius-md);
+        color: #ffffff;
+      }
+
+      .header-title {
+        font-weight: 600;
+      }
+
+      .tool-tabs {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        gap: 4px;
+      }
+
+      .tool-category-tabs,
+      .tool-sub-tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px;
+        scrollbar-width: none;
+      }
+
+      .tool-category-tabs::-webkit-scrollbar,
+      .tool-sub-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab-btn,
+      .sub-tab-btn {
+        align-items: center;
+        border: 1px solid transparent;
+        cursor: pointer;
+        display: inline-flex;
+        flex-shrink: 0;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .tab-btn {
+        background: transparent;
+        border-radius: var(--radius-md);
+        color: var(--text-secondary);
+        font-size: 14px;
+        gap: 8px;
+        padding: 8px 16px;
+      }
+
+      .tab-btn svg {
+        flex-shrink: 0;
+        height: 18px;
+        width: 18px;
+      }
+
+      .tab-btn:hover:not(.active) {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+
+      .sub-tab-btn {
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-size: 13px;
+        gap: 6px;
+        padding: 6px 12px;
+      }
+
+      .sub-tab-btn svg {
+        flex-shrink: 0;
+        height: 16px;
+        width: 16px;
+      }
+
+      .sub-tab-btn:hover:not(.active) {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+      }
+
+      .tab-btn.active,
+      .sub-tab-btn.active {
+        background: var(--accent-subtle);
+        border-color: var(--accent);
+        color: var(--accent-text);
+      }
+
+      .annotate-toolbar-panel {
+        align-items: center;
+        display: none;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 4px;
+        scrollbar-width: none;
+      }
+
+      .annotate-toolbar-panel::-webkit-scrollbar {
+        display: none;
+      }
+
+      .app-frame:has(#annotate-options:not(.hidden)) .annotate-toolbar-panel {
+        display: flex;
+      }
+
+      .annotate-toolbar-divider {
+        background: var(--border-color);
+        flex-shrink: 0;
+        height: 20px;
+        width: 1px;
+      }
+
+      .page-header-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .page-header-description {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-top: 4px;
+      }
+
+      .workspace-panel {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+      }
+
+      .upload-zone {
+        background: var(--bg-tertiary);
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        padding: 48px 24px;
+        text-align: center;
+      }
+
+      .upload-zone .icon-48 {
+        color: var(--text-muted);
+      }
+
+      .upload-zone:hover {
+        background: var(--accent-subtle);
+        border-color: var(--accent);
+      }
+
+      .upload-zone:hover .text-muted,
+      .upload-zone:hover .icon-48 {
+        color: var(--text-secondary);
+      }
+
+      .input-field {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 14px;
+        min-height: 36px;
+        padding: 6px 12px;
+        width: 100%;
+      }
+
+      .input-field:focus {
+        border-color: var(--accent);
+      }
+
+      .input-field::placeholder {
+        color: var(--text-muted);
+      }
+
+      input[type='range'],
+      input[type='range'].input-field {
+        -webkit-appearance: none;
+        appearance: none;
+        background: var(--border-strong);
+        border: 0;
+        border-radius: 999px;
+        height: 4px;
+        min-height: 0;
+        padding: 0;
+        width: 100%;
+      }
+
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        background: var(--accent);
+        border: 2px solid var(--bg-primary);
+        border-radius: 50%;
+        box-sizing: border-box;
+        cursor: pointer;
+        height: 16px;
+        transition: transform 0.2s;
+        width: 16px;
+      }
+
+      input[type='range']::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+
+      input[type='range']::-moz-range-thumb {
+        background: var(--accent);
+        border: 2px solid var(--bg-primary);
+        border-radius: 50%;
+        box-sizing: border-box;
+        cursor: pointer;
+        height: 16px;
+        width: 16px;
+      }
+
+      input[type='checkbox'],
+      input[type='radio'] {
+        accent-color: var(--accent);
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 0;
+      }
+
+      #annotate-inspector {
+        gap: 12px;
+      }
+
+      .form-field-label {
+        color: var(--text-secondary);
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+
+      .card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+      }
+
+      .output-summary-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+      }
+
+      .output-summary-row {
+        align-items: baseline;
+        display: flex;
+        font-size: 13px;
+        gap: 12px;
+        justify-content: space-between;
+      }
+
+      .output-summary-row dt {
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+
+      .output-summary-row dd {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin: 0;
+        overflow-wrap: anywhere;
+        text-align: right;
+      }
+
+      .pdf-list-item,
+      .pdf-empty-state {
+        background: var(--bg-tertiary);
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        padding: 10px 12px;
+      }
+
+      .pdf-empty-state {
+        color: var(--text-muted);
+      }
+
+      .file-name {
+        display: flex;
+        max-width: 100%;
+        min-width: 0;
+        white-space: nowrap;
+      }
+
+      .file-name-head {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .file-name-tail {
+        flex-shrink: 0;
+      }
+
+      .pdf-file-list-item {
+        display: flex;
+        min-width: 0;
+      }
+
+      .pdf-file-list-size,
+      .pdf-preview-meta-detail {
+        flex-shrink: 0;
+        white-space: pre;
+      }
+
+      .organize-workspace {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 4px;
+      }
+
+      .pdf-card-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+
+      .pdf-card-grid > .pdf-empty-state {
+        grid-column: 1 / -1;
+      }
+
+      .pdf-page-card {
+        background: var(--bg-tertiary);
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+        padding: 8px;
+        position: relative;
+      }
+
+      .pdf-page-card-deleted {
+        border-color: var(--danger);
+      }
+
+      .pdf-page-card-preview {
+        align-items: center;
+        aspect-ratio: 3 / 4;
+        background: var(--bg-page);
+        border-radius: var(--radius-sm);
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .pdf-page-thumbnail {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transform: rotate(var(--page-rotation, 0deg))
+          scale(var(--page-scale, 1));
+      }
+
+      .pdf-page-card-deleted .pdf-page-thumbnail {
+        opacity: 0.4;
+      }
+
+      .pdf-page-thumbnail-placeholder {
+        color: var(--text-page);
+        font-size: 12px;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .pdf-page-summary {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .pdf-page-summary strong {
+        font-size: 13px;
+        min-width: 0;
+      }
+
+      .pdf-page-summary > span {
+        color: var(--text-muted);
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .pdf-page-summary .pdf-page-badge {
+        background: var(--bg-primary);
+        border-radius: 999px;
+        color: var(--danger);
+        font-weight: 600;
+        justify-self: start;
+        padding: 0 8px;
+      }
+
+      .pdf-page-actions {
+        display: grid;
+        gap: 4px;
+        grid-auto-columns: minmax(0, 1fr);
+        grid-auto-flow: column;
+        width: 100%;
+      }
+
+      .annotate-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .annotate-segmented {
+        display: grid;
+        gap: 6px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .annotate-segmented-btn {
+        justify-content: center;
+        min-height: 36px;
+      }
+
+      .annotate-toolbar button,
+      .pdf-page-actions button {
+        background: var(--bg-tertiary);
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .annotate-toolbar button {
+        padding: 6px 12px;
+      }
+
+      .pdf-page-actions button {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        min-height: 32px;
+        padding: 4px;
+      }
+
+      .pdf-page-actions button svg {
+        height: 16px;
+        width: 16px;
+      }
+
+      .pdf-page-actions button:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+      }
+
+      .workspace-view-switch {
+        display: none;
+        flex-shrink: 0;
+        gap: 8px;
+        padding: 4px;
+      }
+
+      .workspace-drop-panel {
+        display: none;
+      }
+
+      #pdf-workspace[data-has-files='false'] .workspace-drop-panel {
+        align-items: center;
+        background: var(--bg-canvas);
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius-lg);
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+        min-height: 0;
+        padding: 32px 16px;
+        text-align: center;
+      }
+
+      #pdf-workspace[data-has-files='false']
+        :is(
+          [data-workspace-grid],
+          #text-workspace,
+          .preview-workspace-panel,
+          .workspace-view-switch,
+          .annotate-toolbar-panel
+        ) {
+        display: none !important;
+      }
+
+      .workspace-drop-panel .icon-48 {
+        color: var(--text-muted);
+      }
+
+      .workspace-drop-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .workspace-drop-accept {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin: 0;
+      }
+
+      .workspace-drop-note {
+        color: var(--text-muted);
+        font-size: 12px;
+        margin: 0;
+      }
+
+      .workspace-drop-overlay {
+        align-items: center;
+        background:
+          linear-gradient(var(--accent-subtle), var(--accent-subtle)),
+          var(--bg-secondary);
+        border: 2px dashed var(--accent);
+        border-radius: var(--radius-lg);
+        color: var(--accent-text);
+        display: flex;
+        font-size: 16px;
+        font-weight: 600;
+        inset: 8px;
+        top: var(--workspace-drop-overlay-top, 8px);
+        justify-content: center;
+        pointer-events: none;
+        position: absolute;
+        z-index: 20;
+      }
+
+      .header-actions {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+      }
+
+      .tool-overview {
+        display: none;
+      }
+
+      body[data-app-view='home'] .tool-overview {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 16px;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 4px;
+      }
+
+      .tool-overview-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .tool-overview-note {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin: 0;
+      }
+
+      .tool-overview-groups {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .tool-overview-group-title {
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 8px;
+      }
+
+      .tool-overview-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+
+      .tool-overview-card {
+        align-items: flex-start;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 16px;
+        text-align: left;
+      }
+
+      .tool-overview-card:hover,
+      .tool-overview-card:focus-visible {
+        border-color: var(--accent);
+      }
+
+      .tool-overview-card svg,
+      .tool-overview-card i {
+        color: var(--accent-text);
+        height: 20px;
+        width: 20px;
+      }
+
+      .tool-overview-card-title {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .tool-overview-card-description {
+        color: var(--text-secondary);
+        font-size: 13px;
+      }
+
+      body[data-app-view='home'] .sidebar,
+      body[data-app-view='home']
+        #pdf-workspace
+        > :not(.tool-tabs):not(#tool-overview),
+      body[data-app-view='home'] [data-tool-category-panel],
+      body[data-app-view='home'] .mobile-bottom-nav {
+        display: none !important;
+      }
+
+      body[data-app-view='home'] .app-frame {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .main-content:has([data-workspace-grid]:not(.hidden))
+        .workspace-view-switch {
+        display: flex;
+      }
+
+      .main-content[data-workspace-view='grid']:has(
+          [data-workspace-grid]:not(.hidden)
+        )
+        .preview-workspace-panel {
+        display: none;
+      }
+
+      .main-content[data-workspace-view='page'] [data-workspace-grid] {
+        display: none;
+      }
+
+      .pdf-card-order-badge {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        color: var(--text-primary);
+        font-size: 11px;
+        font-weight: 600;
+        left: 14px;
+        padding: 0 6px;
+        position: absolute;
+        top: 14px;
+        z-index: 1;
+      }
+
+      .split-workspace-header {
+        align-items: baseline;
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+      }
+
+      .split-selection-count {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .split-range-hint {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+
+      .pdf-page-select-button {
+        border: 0;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        position: relative;
+        width: 100%;
+      }
+
+      .pdf-page-card-selected {
+        background: var(--accent-subtle);
+        border-color: var(--accent);
+      }
+
+      .pdf-card-check-badge {
+        align-items: center;
+        background: var(--accent);
+        border-radius: 999px;
+        color: var(--on-accent);
+        display: inline-flex;
+        height: 22px;
+        justify-content: center;
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        width: 22px;
+      }
+
+      .pdf-card-check-badge svg {
+        height: 14px;
+        width: 14px;
+      }
+
+      .annotate-toolbar button:hover:not(:disabled),
+      .pdf-page-actions button:hover:not(:disabled) {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+      }
+
+      .app-shell {
+        background: var(--bg-secondary);
+        height: 100vh;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .app-header {
+        background: var(--bg-primary);
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
+        padding: 16px 24px;
+      }
+
+      .app-frame {
+        display: grid;
+        flex: 1;
+        grid-template-columns: 320px minmax(0, 1fr) 320px;
+        min-height: 0;
+      }
+
+      .sidebar {
+        background: var(--bg-primary);
+        overflow-y: auto;
+        width: auto;
+      }
+
+      .sidebar-left {
+        border-right: 1px solid var(--border-color);
+      }
+
+      .sidebar-right {
+        border-left: 1px solid var(--border-color);
+      }
+
+      .sidebar-content {
+        padding: 20px;
+      }
+
+      .sidebar-section {
+        margin-bottom: 24px;
+      }
+
+      .sidebar-title {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: var(--border-strong);
+        border-radius: 999px;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+      }
+
+      .main-content {
+        background: var(--bg-secondary);
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 12px;
+        height: 100%;
+        min-height: 0;
+        min-width: 0;
+        overflow: hidden;
+        padding: 16px;
+        position: relative;
+      }
+
+      .workspace-panel {
+        min-height: 100%;
+      }
+
+      .preview-workspace-panel {
+        align-items: stretch;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 0;
+        min-height: 0;
+        padding: 0;
+        width: 100%;
+      }
+
+      .pdf-preview-frame {
+        align-items: center;
+        background: var(--bg-canvas);
+        border: 0;
+        border-radius: var(--radius-lg);
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        min-height: 0;
+        padding: 24px;
+        position: relative;
+        width: 100%;
+      }
+
+      .pdf-preview-image {
+        background: var(--bg-page);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+      }
+
+      .annotation-overlay-host {
+        position: absolute;
+        z-index: 5;
+      }
+
+      .annotation-overlay-host .annotation-overlay {
+        height: 100%;
+        inset: 0;
+        position: absolute;
+        touch-action: none;
+        width: 100%;
+      }
+
+      .compression-level-card {
+        align-items: flex-start;
+        background: var(--bg-tertiary);
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        display: flex;
+        gap: 12px;
+        min-height: 52px;
+        padding: 12px;
+      }
+
+      .compression-level-card:has(input:checked) {
+        background: var(--accent-subtle);
+        border-color: var(--accent);
+      }
+
+      .compression-level-card:has(input:checked) strong {
+        color: var(--accent-text);
+      }
+
+      .compression-level-card input {
+        margin-top: 0.2rem;
+      }
+
+      .compression-level-card span,
+      .compression-level-card small {
+        display: block;
+      }
+
+      .compression-level-card small {
+        color: var(--text-muted);
+        line-height: 1.45;
+        margin-top: 0.15rem;
+      }
+
+      .compression-level-card:has(input:checked) small {
+        color: var(--text-secondary);
+      }
+
+      .compression-warning {
+        background: var(--warning-subtle);
+        border-radius: var(--radius-md);
+        color: var(--warning);
+        font-size: 13px;
+        line-height: 1.5;
+        padding: 8px 12px;
+      }
+
+      #compression-options {
+        min-inline-size: 0;
+      }
+
+      .alert-danger {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-inline-start: 3px solid var(--danger);
+        border-radius: var(--radius-md);
+        color: var(--danger);
+        padding: 12px;
+      }
+
+      .pdf-preview-meta-badge {
+        color: var(--text-secondary);
+        display: flex;
+        font-size: 12px;
+        justify-content: center;
+        margin: 0;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .pdf-preview-toolbar {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 100%;
+        min-width: 0;
+        padding-top: 8px;
+      }
+
+      .pdf-preview-navigation {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+      }
+
+      .pdf-preview-nav-button,
+      .pdf-preview-page-indicator {
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        background: var(--bg-glass);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        min-height: 40px;
+      }
+
+      .pdf-preview-nav-button {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        min-width: 44px;
+        padding: 8px 10px;
+      }
+
+      .pdf-preview-nav-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+
+      .pdf-preview-page-indicator {
+        align-items: center;
+        color: var(--text-secondary);
+        display: inline-flex;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        justify-content: center;
+        min-width: 96px;
+        padding: 8px 12px;
+      }
+
+      .pdf-preview-placeholder {
+        align-items: center;
+        color: var(--text-muted);
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        height: 100%;
+        justify-content: center;
+        min-height: 100%;
+        padding: 96px 24px;
+        text-align: center;
+        width: 100%;
+      }
+
+      .annotation-text-editor {
+        background: transparent;
+        border: 0;
+        box-sizing: content-box;
+        margin: 0;
+        outline: 1.5px dashed #15803d;
+        outline-offset: 2px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        resize: none;
+        transform-origin: center center;
+        white-space: pre-wrap;
+        word-break: break-all;
+        z-index: 1;
+      }
+
+      .annotation-text-editor:focus-visible {
+        outline: 1.5px dashed #15803d;
+        outline-offset: 2px;
+      }
+
+      .annotation-text-editor.is-auto-width {
+        white-space: pre;
+      }
+
+      .mobile-bottom-nav {
+        background: var(--bg-primary);
+        border-top: 1px solid var(--border-color);
+        bottom: 0;
+        display: none;
+        left: 0;
+        padding: 6px 8px;
+        padding-bottom: max(env(safe-area-inset-bottom), 6px);
+        position: fixed;
+        right: 0;
+        z-index: 20;
+      }
+
+      .mobile-overlay,
+      .mobile-sidebar-header {
+        display: none;
+      }
+
+      .mobile-overlay {
+        -webkit-backdrop-filter: blur(4px);
+        animation: fade-in 0.2s ease;
+        backdrop-filter: blur(4px);
+        background: var(--bg-overlay);
+        bottom: 0;
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 30;
+      }
+
+      .mobile-overlay.active {
+        display: block;
+      }
+
+      .mobile-nav-btn {
+        align-items: center;
+        background: transparent;
+        border: 0;
+        border-radius: 10px;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        font-size: 9px;
+        font-weight: 600;
+        gap: 2px;
+        justify-content: center;
+        letter-spacing: 0.3px;
+        min-height: 40px;
+        padding: 6px 16px;
+      }
+
+      .mobile-nav-btn svg {
+        height: 22px;
+        stroke-width: 2.5;
+        width: 22px;
+      }
+
+      .mobile-nav-btn.active {
+        color: var(--accent-text);
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slide-up {
+        from {
+          opacity: 0;
+          transform: translateY(100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 1280px) {
+        .app-frame {
+          grid-template-columns: 300px minmax(0, 1fr) 300px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .app-header {
+          align-items: center;
+          flex-direction: row;
+          gap: 12px;
+          justify-content: space-between;
+          min-height: 64px;
+          padding: 12px 16px;
+        }
+
+        .app-header > div:first-child {
+          min-width: 0;
+        }
+
+        .app-header h1 {
+          font-size: 16px;
+          line-height: 1.2;
+        }
+
+        .header-logo {
+          height: 32px !important;
+          width: 32px !important;
+        }
+
+        .header-title {
+          font-size: 14px !important;
+        }
+
+        .header-subtitle {
+          display: none !important;
+        }
+
+        .app-header p {
+          max-width: calc(100vw - 128px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .btn {
+          font-size: 13px;
+          padding: 10px 14px;
+        }
+
+        .btn-icon {
+          height: 40px;
+          padding: 0;
+          width: 40px;
+        }
+
+        .input-field {
+          padding: 10px 12px;
+        }
+
+        input[type='range'],
+        input[type='range'].input-field {
+          height: 8px;
+          padding: 0;
+        }
+
+        input[type='range']::-webkit-slider-thumb {
+          height: 24px;
+          width: 24px;
+        }
+
+        .card {
+          padding: 14px;
+        }
+
+        .upload-zone {
+          padding: 24px 16px;
+        }
+
+        main {
+          padding: 16px 8px;
+        }
+
+        .workspace-panel {
+          padding: 16px;
+        }
+
+        .preview-workspace-panel {
+          padding: 0;
+        }
+
+        .show-tool-overview-label {
+          display: none;
+        }
+
+        .pdf-card-grid {
+          gap: 8px;
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        }
+
+        .app-frame {
+          display: block;
+        }
+
+        .sidebar {
+          animation: slide-up 0.3s ease;
+          bottom: 0;
+          display: none;
+          left: 0;
+          position: fixed;
+          right: 0;
+          top: 0;
+          width: 100%;
+          z-index: 40;
+        }
+
+        .sidebar.mobile-open {
+          display: block;
+        }
+
+        .sidebar-left {
+          border-bottom: 1px solid var(--border-color);
+          border-right: 0;
+        }
+
+        .sidebar-right {
+          border-left: 0;
+          border-top: 1px solid var(--border-color);
+        }
+
+        .main-content {
+          gap: 8px;
+          padding: 8px 8px calc(72px + env(safe-area-inset-bottom));
+        }
+
+        body[data-app-view='home'] .main-content {
+          padding-bottom: 8px;
+        }
+
+        .toast-region {
+          bottom: calc(72px + env(safe-area-inset-bottom));
+        }
+
+        .pdf-preview-frame:has(#compress-compare-figure:not(.hidden)) {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows:
+            minmax(0, max-content) auto minmax(0, max-content)
+            auto auto;
+        }
+
+        .compress-compare-figure:not(.hidden) {
+          grid-column: 1;
+          grid-row: 3 / span 3;
+        }
+
+        .tab-btn {
+          font-size: 12px;
+          padding: 8px 14px;
+        }
+
+        .tab-btn svg {
+          height: 16px;
+          width: 16px;
+        }
+
+        .sub-tab-btn {
+          font-size: 12px;
+        }
+
+        .pdf-preview-frame {
+          padding: 12px;
+        }
+
+        .mobile-bottom-nav {
+          align-items: center;
+          display: flex;
+          justify-content: space-around;
+        }
+
+        .mobile-sidebar-header {
+          align-items: center;
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: space-between;
+          margin: -20px -20px 20px;
+          padding: 14px 20px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .tab-btn {
+          font-size: 11px;
+          padding: 6px 10px;
+        }
+
+        .sub-tab-btn {
+          font-size: 11px;
+          gap: 4px;
+          padding: 4px 10px;
+        }
+
+        .sub-tab-btn svg {
+          height: 14px;
+          width: 14px;
+        }
+
+        .btn {
+          font-size: 12px;
+          gap: 4px;
+          padding: 8px 10px;
+        }
+
+        .btn svg {
+          height: 14px;
+          width: 14px;
+        }
+
+        .btn-icon {
+          padding: 0;
+        }
+      }
+
+      .tooltip {
+        position: relative;
+      }
+
+      .tooltip::after {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        bottom: calc(100% + 8px);
+        color: var(--text-primary);
+        content: attr(data-tooltip);
+        font-size: 12px;
+        left: 50%;
+        opacity: 0;
+        padding: 8px 12px;
+        pointer-events: none;
+        position: absolute;
+        transform: translateX(-50%);
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        z-index: 9999;
+      }
+
+      .tooltip-bottom::after {
+        bottom: auto;
+        top: calc(100% + 8px);
+      }
+
+      .tooltip-left::after {
+        left: auto;
+        right: 0;
+        transform: translateX(0);
+      }
+
+      .tooltip-right::after {
+        left: 0;
+        transform: translateX(0);
+      }
+
+      .tooltip:hover::after {
+        opacity: 1;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <div class="app-shell flex flex-col">
+      <header class="app-header flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="header-logo w-8 h-8 flex items-center justify-center">
+            <i data-lucide="file-text" class="icon-20"></i>
+          </div>
+          <div>
+            <h1 class="header-title text-lg font-semibold">PDF Tools</h1>
+            <p class="header-subtitle text-xs text-muted">
+              เครื่องมือจัดการ PDF ในเครื่องคุณ
+            </p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button
+            id="show-tool-overview-button"
+            class="btn btn-ghost"
+            type="button"
+            aria-label="เครื่องมือทั้งหมด"
+          >
+            <i data-lucide="layout-grid" class="icon-20" aria-hidden="true"></i>
+            <span class="show-tool-overview-label">เครื่องมือทั้งหมด</span>
+          </button>
+          <button
+            id="dark-mode-toggle"
+            class="btn btn-ghost btn-icon tooltip"
+            type="button"
+            aria-label="สลับโหมดสี"
+            data-tooltip="สลับโหมดสี"
+          >
+            <span id="dark-mode-icon"
+              ><i data-lucide="moon" class="icon-20"></i
+            ></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="app-frame">
+        <aside
+          id="pdf-input-sidebar"
+          class="sidebar sidebar-left scrollbar-thin"
+        >
+          <div class="sidebar-content">
+            <div class="mobile-sidebar-header">
+              <h2 class="font-semibold">ตั้งค่า</h2>
+              <button
+                id="close-input-sidebar"
+                class="btn btn-ghost btn-icon"
+                type="button"
+                aria-label="ปิดตั้งค่า"
+              >
+                <i data-lucide="x" class="icon-20"></i>
+              </button>
+            </div>
+            <section class="sidebar-section">
+              <div>
+                <h2 id="pdf-tool-title" class="page-header-title">รวม PDF</h2>
+                <p id="pdf-tool-description" class="page-header-description">
+                  รวม PDF หลายไฟล์เป็นไฟล์เดียว
+                </p>
+              </div>
+            </section>
+
+            <div class="sidebar-title">อัปโหลดไฟล์</div>
+            <label
+              id="pdf-upload-section"
+              class="upload-zone block sidebar-section"
+            >
+              <input
+                id="pdf-file-input"
+                class="sr-only"
+                type="file"
+                accept="application/pdf"
+                multiple
+              />
+              <div class="text-center">
+                <i
+                  data-lucide="upload-cloud"
+                  class="icon-48 mx-auto mb-3"
+                  aria-hidden="true"
+                ></i>
+                <div class="font-semibold">
+                  ลากไฟล์มาวาง หรือคลิกเพื่อเลือกไฟล์
+                </div>
+                <div class="text-sm mt-1 text-muted">
+                  ไฟล์จะถูกประมวลผลใน browser และไม่อัปโหลดไป server
+                </div>
+              </div>
+            </label>
+
+            <section class="sidebar-section">
+              <div class="sidebar-title">ไฟล์ที่เลือก</div>
+              <ul id="pdf-file-list" class="space-y-2"></ul>
+            </section>
+
+            <div id="split-options" class="hidden sidebar-section">
+              <label
+                class="block font-medium text-sm mb-2"
+                for="split-range-input"
+              >
+                ช่วงหน้า
+              </label>
+              <p id="split-range-help" class="split-range-help"></p>
+              <input
+                id="split-range-input"
+                aria-describedby="split-range-help split-range-hint"
+                class="input-field"
+                type="text"
+                placeholder="เช่น 1-3,5,8-10"
+              />
+              <p
+                id="split-range-hint"
+                class="split-range-hint"
+                aria-live="polite"
+              ></p>
+            </div>
+
+            <div id="watermark-options" class="hidden sidebar-section card">
+              <h3 class="font-semibold mb-3">ตั้งค่าลายน้ำ</h3>
+              <div class="grid gap-4">
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-text"
+                  >
+                    ข้อความ
+                  </label>
+                  <input
+                    id="watermark-text"
+                    class="input-field"
+                    type="text"
+                    value="CONFIDENTIAL"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-position"
+                  >
+                    ตำแหน่ง
+                  </label>
+                  <select id="watermark-position" class="input-field">
+                    <option value="center">กลาง</option>
+                    <option value="top-left">บนซ้าย</option>
+                    <option value="top-right">บนขวา</option>
+                    <option value="bottom-left">ล่างซ้าย</option>
+                    <option value="bottom-right">ล่างขวา</option>
+                  </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      class="block font-medium text-sm mb-2"
+                      for="watermark-offset-x"
+                    >
+                      เลื่อน X (pt)
+                    </label>
+                    <input
+                      id="watermark-offset-x"
+                      class="input-field"
+                      type="number"
+                      min="-2000"
+                      max="2000"
+                      value="0"
+                      aria-describedby="watermark-offset-help"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block font-medium text-sm mb-2"
+                      for="watermark-offset-y"
+                    >
+                      เลื่อน Y (pt)
+                    </label>
+                    <input
+                      id="watermark-offset-y"
+                      class="input-field"
+                      type="number"
+                      min="-2000"
+                      max="2000"
+                      value="0"
+                      aria-describedby="watermark-offset-help"
+                    />
+                  </div>
+                  <p
+                    id="watermark-offset-help"
+                    class="col-span-2 text-xs text-muted"
+                  >
+                    X บวก = ขวา, Y บวก = ขึ้น (นับจากตำแหน่งที่เลือก)
+                  </p>
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-color"
+                  >
+                    สีข้อความ
+                  </label>
+                  <input
+                    id="watermark-color"
+                    class="input-field"
+                    type="color"
+                    value="#737373"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-size"
+                  >
+                    ขนาดตัวอักษร
+                  </label>
+                  <input
+                    id="watermark-size"
+                    class="input-field"
+                    type="number"
+                    min="8"
+                    max="96"
+                    value="48"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-opacity"
+                  >
+                    ความโปร่งใส (%)
+                  </label>
+                  <input
+                    id="watermark-opacity"
+                    class="input-field"
+                    type="number"
+                    min="5"
+                    max="100"
+                    value="30"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-rotation"
+                  >
+                    องศาหมุน
+                  </label>
+                  <input
+                    id="watermark-rotation"
+                    class="input-field"
+                    type="number"
+                    min="-180"
+                    max="180"
+                    value="-30"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="watermark-page-range"
+                  >
+                    ช่วงหน้า
+                  </label>
+                  <input
+                    id="watermark-page-range"
+                    class="input-field"
+                    type="text"
+                    placeholder="ว่างไว้ = ทุกหน้า เช่น 1-5,8"
+                  />
+                </div>
+                <label class="flex items-center gap-3">
+                  <input id="watermark-pattern" type="checkbox" />
+                  <span>ลายน้ำซ้ำทั้งหน้า</span>
+                </label>
+                <div
+                  id="watermark-pattern-gap-options"
+                  class="hidden grid grid-cols-2 gap-3"
+                >
+                  <div>
+                    <label
+                      class="block font-medium text-sm mb-2"
+                      for="watermark-gap-x"
+                    >
+                      ระยะห่าง X (pt)
+                    </label>
+                    <input
+                      id="watermark-gap-x"
+                      class="input-field"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="40"
+                      aria-describedby="watermark-gap-help"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block font-medium text-sm mb-2"
+                      for="watermark-gap-y"
+                    >
+                      ระยะห่าง Y (pt)
+                    </label>
+                    <input
+                      id="watermark-gap-y"
+                      class="input-field"
+                      type="number"
+                      min="0"
+                      max="500"
+                      value="40"
+                      aria-describedby="watermark-gap-help"
+                    />
+                  </div>
+                  <p
+                    id="watermark-gap-help"
+                    class="col-span-2 text-xs text-muted"
+                  >
+                    ระยะห่างระหว่างข้อความตามแนวที่หมุน 0 = ชิดกันแต่ไม่ทับ
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="page-number-options" class="hidden sidebar-section card">
+              <h3 class="font-semibold mb-3">ตั้งค่าเลขหน้า</h3>
+              <div class="grid gap-4">
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="page-number-format"
+                  >
+                    รูปแบบ
+                  </label>
+                  <select id="page-number-format" class="input-field">
+                    <option value="number">1</option>
+                    <option value="page_label">Page 1</option>
+                    <option value="page_label_total">Page 1 of 10</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="page-number-position"
+                  >
+                    ตำแหน่ง
+                  </label>
+                  <select id="page-number-position" class="input-field">
+                    <option value="top-left">บนซ้าย</option>
+                    <option value="top-center">บนกลาง</option>
+                    <option value="top-right">บนขวา</option>
+                    <option value="bottom-left" selected>ล่างซ้าย</option>
+                    <option value="bottom-center">ล่างกลาง</option>
+                    <option value="bottom-right">ล่างขวา</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="page-number-start"
+                  >
+                    เลขเริ่มต้น
+                  </label>
+                  <input
+                    id="page-number-start"
+                    class="input-field"
+                    type="number"
+                    min="1"
+                    max="9999"
+                    value="1"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block font-medium text-sm mb-2"
+                    for="page-number-range"
+                  >
+                    ช่วงหน้า
+                  </label>
+                  <input
+                    id="page-number-range"
+                    class="input-field"
+                    type="text"
+                    placeholder="ว่างไว้ = ทุกหน้า เช่น 1-5,8"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div id="annotate-options" class="hidden sidebar-section card">
+              <h3 class="font-semibold mb-3">คุณสมบัติองค์ประกอบ</h3>
+              <div id="annotate-inspector" class="grid gap-3">
+                <p class="text-sm text-muted">
+                  เลือกองค์ประกอบเพื่อแก้ไขคุณสมบัติ
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <main
+          id="pdf-workspace"
+          class="main-content"
+          data-workspace-view="grid"
+        >
+          <nav class="tool-tabs" aria-label="เครื่องมือ PDF">
+            <div
+              class="tool-category-tabs"
+              role="group"
+              aria-label="หมวดเครื่องมือ"
+            >
+              <button
+                type="button"
+                class="tab-btn active"
+                data-tool-category-tab="organize"
+                aria-pressed="true"
+              >
+                <i data-lucide="layers"></i><span>จัดการหน้า</span>
+              </button>
+              <button
+                type="button"
+                class="tab-btn"
+                data-tool-category-tab="convert"
+                aria-pressed="false"
+              >
+                <i data-lucide="repeat"></i><span>แปลงไฟล์</span>
+              </button>
+              <button
+                type="button"
+                class="tab-btn"
+                data-tool-category-tab="extract"
+                aria-pressed="false"
+              >
+                <i data-lucide="file-output"></i><span>ดึงข้อมูล</span>
+              </button>
+              <button
+                type="button"
+                class="tab-btn"
+                data-tool-category-tab="edit"
+                aria-pressed="false"
+              >
+                <i data-lucide="pen-line"></i><span>แก้ไข</span>
+              </button>
+              <button
+                type="button"
+                class="tab-btn"
+                data-tool-category-tab="optimize"
+                aria-pressed="false"
+              >
+                <i data-lucide="gauge"></i><span>บีบอัด</span>
+              </button>
+            </div>
+            <div
+              class="tool-sub-tabs"
+              data-tool-category-panel="organize"
+              role="group"
+              aria-label="เครื่องมือ"
+            >
+              <button
+                type="button"
+                class="sub-tab-btn active"
+                data-pdf-tool="merge"
+                data-tool-category="organize"
+                aria-pressed="true"
+              >
+                <i data-lucide="combine"></i><span>รวม PDF</span>
+              </button>
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="split"
+                data-tool-category="organize"
+                aria-pressed="false"
+              >
+                <i data-lucide="scissors"></i><span>แยก PDF</span>
+              </button>
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="organize"
+                data-tool-category="organize"
+                aria-pressed="false"
+              >
+                <i data-lucide="list-tree"></i
+                ><span>จัดเรียง / ลบ / หมุนหน้า</span>
+              </button>
+            </div>
+            <div
+              class="tool-sub-tabs hidden"
+              data-tool-category-panel="convert"
+              role="group"
+              aria-label="เครื่องมือ"
+            >
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="images_to_pdf"
+                data-tool-category="convert"
+                aria-pressed="false"
+              >
+                <i data-lucide="images"></i><span>รูปภาพเป็น PDF</span>
+              </button>
+            </div>
+            <div
+              class="tool-sub-tabs hidden"
+              data-tool-category-panel="extract"
+              role="group"
+              aria-label="เครื่องมือ"
+            >
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="extract_text"
+                data-tool-category="extract"
+                aria-pressed="false"
+              >
+                <i data-lucide="file-text"></i><span>ดึงข้อความ</span>
+              </button>
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="extract_images"
+                data-tool-category="extract"
+                aria-pressed="false"
+              >
+                <i data-lucide="image-down"></i><span>แปลงหน้าเป็นรูปภาพ</span>
+              </button>
+            </div>
+            <div
+              class="tool-sub-tabs hidden"
+              data-tool-category-panel="edit"
+              role="group"
+              aria-label="เครื่องมือ"
+            >
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="watermark"
+                data-tool-category="edit"
+                aria-pressed="false"
+              >
+                <i data-lucide="stamp"></i><span>ใส่ลายน้ำ</span>
+              </button>
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="page_numbers"
+                data-tool-category="edit"
+                aria-pressed="false"
+              >
+                <i data-lucide="list-ordered"></i><span>ใส่เลขหน้า</span>
+              </button>
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="annotate"
+                data-tool-category="edit"
+                aria-pressed="false"
+              >
+                <i data-lucide="pen-tool"></i><span>เขียน / วาดบนหน้า</span>
+              </button>
+            </div>
+            <div
+              class="tool-sub-tabs hidden"
+              data-tool-category-panel="optimize"
+              role="group"
+              aria-label="เครื่องมือ"
+            >
+              <button
+                type="button"
+                class="sub-tab-btn"
+                data-pdf-tool="compress"
+                data-tool-category="optimize"
+                aria-pressed="false"
+              >
+                <i data-lucide="archive"></i><span>บีบอัด PDF</span>
+              </button>
+            </div>
+          </nav>
+          <div class="workspace-view-switch" role="group" aria-label="มุมมอง">
+            <button
+              type="button"
+              class="sub-tab-btn active"
+              data-workspace-view-option="grid"
+              aria-pressed="true"
+            >
+              <i data-lucide="layout-grid"></i><span>กริด</span>
+            </button>
+            <button
+              type="button"
+              class="sub-tab-btn"
+              data-workspace-view-option="page"
+              aria-pressed="false"
+            >
+              <i data-lucide="file"></i><span>ทีละหน้า</span>
+            </button>
+          </div>
+          <div
+            id="annotate-toolbar-panel"
+            class="annotate-toolbar-panel"
+            role="toolbar"
+            aria-label="เครื่องมือวาด"
+          >
+            <button
+              type="button"
+              class="sub-tab-btn"
+              id="annotate-add-text"
+              aria-pressed="false"
+            >
+              <i data-lucide="type"></i><span>ข้อความ</span>
+            </button>
+            <button type="button" class="sub-tab-btn" id="annotate-add-block">
+              <i data-lucide="square"></i><span>กล่องสี</span>
+            </button>
+            <button type="button" class="sub-tab-btn" id="annotate-add-image">
+              <i data-lucide="image"></i><span>รูปภาพ</span>
+            </button>
+            <button type="button" class="sub-tab-btn" id="annotate-add-line">
+              <i data-lucide="move-up-right"></i><span>เส้น/ลูกศร</span>
+            </button>
+            <span class="annotate-toolbar-divider" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="sub-tab-btn"
+              id="annotate-undo"
+              aria-label="ย้อนกลับ"
+              title="ย้อนกลับ"
+            >
+              <i data-lucide="undo-2"></i>
+            </button>
+            <button
+              type="button"
+              class="sub-tab-btn"
+              id="annotate-redo"
+              aria-label="ทำซ้ำ"
+              title="ทำซ้ำ"
+            >
+              <i data-lucide="redo-2"></i>
+            </button>
+            <input
+              id="annotate-image-input"
+              type="file"
+              accept="image/png,image/jpeg"
+              class="hidden"
+            />
+          </div>
+          <div
+            id="organize-options"
+            class="hidden organize-workspace scrollbar-thin"
+            data-workspace-grid
+          >
+            <h3 class="sidebar-title">รายการหน้า</h3>
+            <div id="pdf-page-list" class="pdf-card-grid"></div>
+          </div>
+          <div
+            id="merge-workspace"
+            class="hidden organize-workspace scrollbar-thin"
+            data-workspace-grid
+          >
+            <h3 class="sidebar-title">ลำดับไฟล์</h3>
+            <div id="merge-file-list" class="pdf-card-grid"></div>
+          </div>
+          <div
+            id="split-workspace"
+            class="hidden organize-workspace scrollbar-thin"
+            data-workspace-grid
+          >
+            <div class="split-workspace-header">
+              <h3 class="sidebar-title">เลือกหน้า</h3>
+              <span
+                id="split-selection-count"
+                class="split-selection-count"
+              ></span>
+            </div>
+            <div id="split-page-list" class="pdf-card-grid"></div>
+          </div>
+          <section
+            id="text-workspace"
+            class="hidden text-workspace scrollbar-thin"
+            aria-label="ข้อความที่ดึงได้"
+          >
+            <div class="text-workspace-header">
+              <h3 class="sidebar-title">ข้อความที่ดึงได้</h3>
+              <button
+                id="copy-text-button"
+                class="btn btn-secondary"
+                type="button"
+                disabled
+              >
+                <i data-lucide="copy" class="icon-18"></i>
+                <span>คัดลอกทั้งหมด</span>
+              </button>
+            </div>
+            <div id="text-output" class="text-output"></div>
+          </section>
+          <section
+            id="workspace-drop-panel"
+            class="workspace-drop-panel"
+            aria-labelledby="workspace-drop-title"
+          >
+            <i
+              data-lucide="upload-cloud"
+              class="icon-48"
+              aria-hidden="true"
+            ></i>
+            <h2 id="workspace-drop-title" class="workspace-drop-title">
+              ลากไฟล์มาวางที่นี่
+            </h2>
+            <p id="workspace-drop-accept" class="workspace-drop-accept"></p>
+            <button
+              id="workspace-drop-select-button"
+              class="btn btn-primary"
+              type="button"
+            >
+              เลือกไฟล์
+            </button>
+            <p class="workspace-drop-note">
+              ไฟล์จะถูกประมวลผลใน browser และไม่อัปโหลดไป server
+            </p>
+          </section>
+          <div
+            id="workspace-drop-overlay"
+            class="workspace-drop-overlay hidden"
+            aria-hidden="true"
+          >
+            <span id="workspace-drop-overlay-text"></span>
+          </div>
+          <section
+            id="tool-overview"
+            class="tool-overview"
+            aria-labelledby="tool-overview-title"
+          >
+            <h2 id="tool-overview-title" class="tool-overview-title">
+              เลือกเครื่องมือ
+            </h2>
+            <p class="tool-overview-note">
+              ทุกเครื่องมือทำงานใน browser ไฟล์ไม่ถูกอัปโหลดไป server
+            </p>
+            <div id="tool-overview-groups" class="tool-overview-groups"></div>
+          </section>
+          <section class="workspace-panel preview-workspace-panel">
+            <div class="pdf-preview-frame">
+              <img
+                id="pdf-preview-image"
+                class="pdf-preview-image hidden"
+                alt="ตัวอย่าง PDF"
+              />
+              <p
+                id="compress-original-caption"
+                class="hidden compress-compare-caption"
+              ></p>
+              <figure
+                id="compress-compare-figure"
+                class="hidden compress-compare-figure"
+                aria-live="polite"
+              >
+                <img
+                  id="compress-compare-image"
+                  class="pdf-preview-image hidden"
+                  alt=""
+                />
+                <figcaption
+                  id="compress-compare-caption"
+                  class="compress-compare-caption"
+                ></figcaption>
+                <p
+                  id="compress-compare-warning"
+                  class="hidden compress-compare-warning"
+                ></p>
+              </figure>
+              <div
+                id="annotate-overlay"
+                class="annotation-overlay-host hidden"
+              ></div>
+              <div id="pdf-preview-placeholder" class="pdf-preview-placeholder">
+                <i data-lucide="file-search" class="icon-48 mx-auto mb-3"></i>
+                <div class="font-semibold">ตัวอย่าง PDF จะแสดงที่นี่</div>
+                <div class="text-sm mt-1">อัปโหลดไฟล์เพื่อเริ่มดูตัวอย่าง</div>
+              </div>
+            </div>
+            <div class="pdf-preview-toolbar">
+              <p id="pdf-preview-meta" class="pdf-preview-meta-badge">
+                อัปโหลด PDF เพื่อดูตัวอย่างหน้าแรก
+              </p>
+              <div class="pdf-preview-navigation" aria-label="เปลี่ยนหน้า PDF">
+                <button
+                  id="pdf-preview-previous-button"
+                  class="pdf-preview-nav-button tooltip"
+                  type="button"
+                  aria-label="ดูหน้าก่อนหน้า"
+                  data-tooltip="ดูหน้าก่อนหน้า"
+                  disabled
+                >
+                  <i data-lucide="chevron-left" class="icon-20"></i>
+                </button>
+                <span
+                  id="pdf-preview-page-indicator"
+                  class="pdf-preview-page-indicator"
+                >
+                  0 / 0
+                </span>
+                <button
+                  id="pdf-preview-next-button"
+                  class="pdf-preview-nav-button tooltip"
+                  type="button"
+                  aria-label="ดูหน้าถัดไป"
+                  data-tooltip="ดูหน้าถัดไป"
+                  disabled
+                >
+                  <i data-lucide="chevron-right" class="icon-20"></i>
+                </button>
+              </div>
+              <p
+                id="live-preview-hint"
+                class="live-preview-hint"
+                aria-live="polite"
+              ></p>
+            </div>
+          </section>
+          <p
+            id="workspace-busy-indicator"
+            class="hidden workspace-busy-indicator"
+            aria-hidden="true"
+          >
+            <i data-lucide="loader-circle" class="spin-icon"></i
+            ><span id="workspace-busy-text"></span>
+          </p>
+        </main>
+
+        <aside
+          id="pdf-output-sidebar"
+          class="sidebar sidebar-right scrollbar-thin"
+        >
+          <div class="sidebar-content">
+            <div class="mobile-sidebar-header">
+              <h2 class="font-semibold">ส่งออก</h2>
+              <button
+                id="close-output-sidebar"
+                class="btn btn-ghost btn-icon"
+                type="button"
+                aria-label="ปิดส่งออก"
+              >
+                <i data-lucide="x" class="icon-20"></i>
+              </button>
+            </div>
+            <section class="sidebar-section">
+              <div class="sidebar-title">ดำเนินการ</div>
+              <button
+                id="process-pdf-button"
+                class="btn btn-primary w-full"
+                type="button"
+              >
+                <i data-lucide="download" class="icon-18"></i>
+                <span>สร้างและดาวน์โหลด</span>
+              </button>
+            </section>
+
+            <section id="output-summary" class="sidebar-section card">
+              <div class="sidebar-title">สรุปผลลัพธ์</div>
+              <dl class="output-summary-list">
+                <div class="output-summary-row">
+                  <dt>ไฟล์ผลลัพธ์</dt>
+                  <dd data-output-summary="output-file-name">-</dd>
+                </div>
+                <div class="output-summary-row">
+                  <dt>ไฟล์ต้นทาง</dt>
+                  <dd data-output-summary="source-files">-</dd>
+                </div>
+                <div class="output-summary-row">
+                  <dt>หน้าต้นทาง</dt>
+                  <dd data-output-summary="source-pages">-</dd>
+                </div>
+                <div
+                  class="output-summary-row hidden"
+                  data-output-summary-row="export-pages"
+                >
+                  <dt>หน้าที่จะส่งออก</dt>
+                  <dd data-output-summary="export-pages">-</dd>
+                </div>
+              </dl>
+            </section>
+
+            <fieldset
+              id="compression-options"
+              class="hidden sidebar-section card"
+            >
+              <div class="sidebar-title">ตั้งค่าการส่งออก</div>
+              <legend class="sr-only">ระดับการบีบอัด</legend>
+              <h3 class="font-semibold mb-3" aria-hidden="true">
+                ระดับการบีบอัด
+              </h3>
+              <div class="grid gap-2">
+                <label class="compression-level-card">
+                  <input type="radio" name="compression-level" value="low" />
+                  <span>
+                    <strong>ต่ำ</strong>
+                    <small>รักษาข้อความ ลิงก์ และคุณภาพเดิม</small>
+                  </span>
+                </label>
+                <label class="compression-level-card">
+                  <input
+                    type="radio"
+                    name="compression-level"
+                    value="medium"
+                    checked
+                  />
+                  <span>
+                    <strong>กลาง (แนะนำ)</strong>
+                    <small>สมดุลระหว่างขนาดและความชัด</small>
+                  </span>
+                </label>
+                <label class="compression-level-card">
+                  <input type="radio" name="compression-level" value="high" />
+                  <span>
+                    <strong>สูง</strong>
+                    <small>เน้นไฟล์เล็กที่สุดสำหรับส่งต่อ</small>
+                  </span>
+                </label>
+              </div>
+              <p
+                id="compression-warning"
+                class="compression-warning mt-3 text-sm"
+                role="status"
+              >
+                ข้อความ ลิงก์ ฟอร์ม คำอธิบายประกอบ บุ๊กมาร์ก และ metadata
+                บางส่วนจะถูกแปลงเป็นภาพ
+              </p>
+            </fieldset>
+
+            <div
+              id="compression-info"
+              class="hidden sidebar-section card"
+              aria-live="polite"
+            >
+              <h3 class="font-semibold mb-3">ผลการบีบอัด</h3>
+              <div class="grid gap-2">
+                <div class="flex justify-between gap-4">
+                  <span class="text-muted">ขนาดต้นฉบับ</span>
+                  <strong id="compression-original-size">-</strong>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <span class="text-muted">ขนาดหลังบีบอัด</span>
+                  <strong id="compression-compressed-size">-</strong>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <span class="text-muted">ลดลง</span>
+                  <strong id="compression-reduction">-</strong>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <span class="text-muted">ระดับที่ใช้</span>
+                  <strong id="compression-level-result">-</strong>
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="pdf-error-message"
+              class="hidden sidebar-section alert-danger"
+            ></div>
+            <div
+              id="pdf-status-message"
+              class="sidebar-section text-sm text-muted"
+              aria-live="polite"
+            >
+              เลือกไฟล์เพื่อเริ่มต้น
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div id="mobile-overlay" class="mobile-overlay"></div>
+
+    <nav class="mobile-bottom-nav">
+      <button
+        class="mobile-nav-btn"
+        type="button"
+        data-mobile-target="pdf-input-sidebar"
+      >
+        <i data-lucide="sliders-horizontal" class="icon-20"></i>
+        <span>ตั้งค่า</span>
+      </button>
+      <button class="mobile-nav-btn" type="button" data-mobile-action="upload">
+        <i data-lucide="upload" class="icon-20"></i>
+        <span>อัปโหลด</span>
+      </button>
+      <button
+        class="mobile-nav-btn active"
+        type="button"
+        data-mobile-target="pdf-workspace"
+      >
+        <i data-lucide="file-text" class="icon-20"></i>
+        <span>ตัวอย่าง</span>
+      </button>
+      <button
+        class="mobile-nav-btn"
+        type="button"
+        data-mobile-target="pdf-output-sidebar"
+      >
+        <i data-lucide="download" class="icon-20"></i>
+        <span>ส่งออก</span>
+      </button>
+    </nav>
+
+    <div id="toast-region" class="toast-region"></div>
+
+    <script src="js/modules/pdf-file.js"></script>
+    <script src="js/modules/file-name-display.js"></script>
+    <script src="js/modules/pdf-preview.js"></script>
+    <script src="js/modules/pdf-operations.js"></script>
+    <script src="js/modules/pdf-render.js"></script>
+    <script src="js/modules/pdf-text.js"></script>
+    <script src="js/modules/pdf-download.js"></script>
+    <script src="js/modules/annotation-store.js"></script>
+    <script src="js/modules/annotation-geometry.js"></script>
+    <script src="js/modules/annotation-fonts.js"></script>
+    <script src="js/modules/annotation-export.js"></script>
+    <script src="js/modules/annotation-editor.js"></script>
+    <script src="js/modules/output-summary.js"></script>
+    <script src="js/modules/toast.js"></script>
+    <script src="js/modules/live-preview.js"></script>
+    <script src="js/PdfApp.js"></script>
+    <script src="js/modules/tool-tabs.js"></script>
+    <script src="js/modules/workspace-view.js"></script>
+    <script>
+      const SERVICE_WORKER_PATH = './service-worker.js';
+
+      function RegisterServiceWorker() {
+        const supports_service_worker = 'serviceWorker' in navigator;
+        const supports_current_protocol =
+          window.location.protocol === 'http:' ||
+          window.location.protocol === 'https:';
+        if (!supports_service_worker || !supports_current_protocol) {
+          return;
+        }
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register(SERVICE_WORKER_PATH)
+            .catch(function (error) {
+              console.warn('Service worker registration failed.', error);
+            });
+        });
+      }
+
+      RegisterServiceWorker();
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      function InitializeTooltips() {
+        const tooltips = document.querySelectorAll('.tooltip');
+        tooltips.forEach(tooltip => {
+          tooltip.addEventListener('mouseenter', function () {
+            const rect = this.getBoundingClientRect();
+            const tooltip_width = 150;
+            this.classList.remove(
+              'tooltip-left',
+              'tooltip-right',
+              'tooltip-bottom'
+            );
+            if (
+              rect.left + rect.width / 2 + tooltip_width / 2 >
+              window.innerWidth
+            ) {
+              this.classList.add('tooltip-left');
+            } else if (rect.left + rect.width / 2 - tooltip_width / 2 < 0) {
+              this.classList.add('tooltip-right');
+            }
+            if (rect.top < 50) {
+              this.classList.add('tooltip-bottom');
+            }
+          });
+        });
+      }
+
+      InitializeTooltips();
+      const mobile_overlay = document.getElementById('mobile-overlay');
+      const mobile_nav_buttons = document.querySelectorAll(
+        '[data-mobile-target]'
+      );
+      const mobile_panel_ids = ['pdf-input-sidebar', 'pdf-output-sidebar'];
+
+      function IsMobileLayout() {
+        return window.matchMedia('(max-width: 768px)').matches;
+      }
+
+      function CloseMobilePanels() {
+        mobile_panel_ids.forEach(panel_id => {
+          document.getElementById(panel_id)?.classList.remove('mobile-open');
+        });
+        mobile_overlay?.classList.remove('active');
+      }
+
+      function SetActiveMobileNav(active_button) {
+        mobile_nav_buttons.forEach(button => button.classList.remove('active'));
+        active_button?.classList.add('active');
+      }
+
+      mobile_nav_buttons.forEach(nav_button => {
+        nav_button.addEventListener('click', () => {
+          const target_id = nav_button.dataset.mobileTarget;
+          SetActiveMobileNav(nav_button);
+          if (!IsMobileLayout()) {
+            return;
+          }
+          CloseMobilePanels();
+          if (target_id === 'pdf-workspace') {
+            return;
+          }
+          document.getElementById(target_id)?.classList.add('mobile-open');
+          mobile_overlay?.classList.add('active');
+        });
+      });
+
+      document
+        .getElementById('close-input-sidebar')
+        ?.addEventListener('click', CloseMobilePanels);
+      document
+        .getElementById('close-output-sidebar')
+        ?.addEventListener('click', CloseMobilePanels);
+      document
+        .querySelector('[data-mobile-action="upload"]')
+        ?.addEventListener('click', () => {
+          document.getElementById('pdf-file-input')?.click();
+        });
+      mobile_overlay?.addEventListener('click', CloseMobilePanels);
+      document.querySelectorAll('[data-pdf-tool]').forEach(tool_button => {
+        tool_button.addEventListener('click', () => {
+          if (IsMobileLayout()) {
+            CloseMobilePanels();
+            const preview_button = document.querySelector(
+              '[data-mobile-target="pdf-workspace"]'
+            );
+            SetActiveMobileNav(preview_button);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
